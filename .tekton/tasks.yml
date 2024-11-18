@@ -27,7 +27,7 @@ spec:
           rm -rf "${WORKSPACE_SOURCE_PATH}"/.[!.]*
           rm -rf "${WORKSPACE_SOURCE_PATH}"/..?*
         fi
-
+        
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -42,16 +42,34 @@ spec:
       type: string
       default: "-v --with-coverage --cover-package=app"
   steps:
+    - name: setup-virtualenv
+      image: python:3.9-slim
+      workingDir: $(workspaces.source.path)
+      script: |
+        # Create a virtual environment and activate it
+        python3 -m venv venv
+        source venv/bin/activate
     - name: install-dependencies
       image: python:3.9-slim
       workingDir: $(workspaces.source.path)
       script: |
-        # Upgrade pip and install nose using python -m pip to ensure it is installed in the correct Python environment
+        # Install pip and nose in the virtual environment
+        source venv/bin/activate
         python3 -m pip install --upgrade pip
         python3 -m pip install nose
+    - name: verify-installation
+      image: python:3.9-slim
+      workingDir: $(workspaces.source.path)
+      script: |
+        # Verify nose installation within the virtual environment
+        source venv/bin/activate
+        python3 -m pip show nose  # Should show nose package details
+        python3 --version
+        python3 -m nose --version  # Should confirm that nose is available
     - name: run-tests
       image: python:3.9-slim
       workingDir: $(workspaces.source.path)
       script: |
-        # Run the tests using python3 -m nose to ensure it's using the correct Python interpreter
+        # Ensure we're using python3 to run the tests in the virtual environment
+        source venv/bin/activate
         python3 -m nose $(params.args)
