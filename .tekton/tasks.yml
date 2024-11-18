@@ -34,7 +34,6 @@ kind: Task
 metadata:
   name: nose
 spec:
-  description: This task will run unit tests using nose.
   workspaces:
     - name: source
   params:
@@ -47,7 +46,7 @@ spec:
       image: python:3.9-slim
       workingDir: $(workspaces.source.path)
       script: |
-        #!/usr/bin/env sh
-        set -eu
-        echo "Running unit tests with nose..."
-        nosetests $(params.args)
+        # Install nose before running the tests
+        pip install nose
+        # Run the tests with the provided arguments
+        nosetests $(params.args
