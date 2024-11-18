@@ -46,15 +46,15 @@ spec:
       image: python:3.9-slim
       workingDir: $(workspaces.source.path)
       script: |
-        # Create a virtual environment and activate it
+        # Create a virtual environment and activate it using the dot command
         python3 -m venv venv
-        source venv/bin/activate
+        . venv/bin/activate  # Use dot command instead of 'source'
     - name: install-dependencies
       image: python:3.9-slim
       workingDir: $(workspaces.source.path)
       script: |
         # Install pip and nose in the virtual environment
-        source venv/bin/activate
+        . venv/bin/activate  # Activate virtual environment using dot command
         python3 -m pip install --upgrade pip
         python3 -m pip install nose
     - name: verify-installation
@@ -62,7 +62,7 @@ spec:
       workingDir: $(workspaces.source.path)
       script: |
         # Verify nose installation within the virtual environment
-        source venv/bin/activate
+        . venv/bin/activate  # Activate virtual environment using dot command
         python3 -m pip show nose  # Should show nose package details
         python3 --version
         python3 -m nose --version  # Should confirm that nose is available
@@ -71,5 +71,5 @@ spec:
       workingDir: $(workspaces.source.path)
       script: |
         # Ensure we're using python3 to run the tests in the virtual environment
-        source venv/bin/activate
+        . venv/bin/activate  # Activate virtual environment using dot command
         python3 -m nose $(params.args)
