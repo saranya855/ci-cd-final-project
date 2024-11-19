@@ -36,40 +36,21 @@ metadata:
 spec:
   workspaces:
     - name: source
+      description: The workspace containing the source code
   params:
     - name: args
-      description: Arguments to pass to nose
+      description: Arguments to pass to `nose`
       type: string
-      default: "-v --with-coverage --cover-package=app"
+      default: "-v"
   steps:
-    - name: setup-virtualenv
+    - name: nosetests
       image: python:3.9-slim
       workingDir: $(workspaces.source.path)
       script: |
-        # Create a virtual environment and activate it using the dot command
-        python3 -m venv venv
-        . venv/bin/activate  # Use dot command instead of 'source'
-    - name: install-dependencies
-      image: python:3.9-slim
-      workingDir: $(workspaces.source.path)
-      script: |
-        # Install pip and nose in the virtual environment
-        . venv/bin/activate  # Activate virtual environment using dot command
-        python3 -m pip install --upgrade pip
-        python3 -m pip install nose
-    - name: verify-installation
-      image: python:3.9-slim
-      workingDir: $(workspaces.source.path)
-      script: |
-        # Verify nose installation within the virtual environment
-        . venv/bin/activate  # Activate virtual environment using dot command
-        python3 -m pip show nose  # Should show nose package details
-        python3 --version
-        python3 -m nose --version  # Should confirm that nose is available
-    - name: run-tests
-      image: python:3.9-slim
-      workingDir: $(workspaces.source.path)
-      script: |
-        # Ensure we're using python3 to run the tests in the virtual environment
-        . venv/bin/activate  # Activate virtual environment using dot command
-        python3 -m nose $(params.args)
+        #!/bin/bash
+        set -e
+        echo "Upgrading pip and installing dependencies..."
+        python -m pip install --upgrade pip wheel
+        pip install -r requirements.txt
+        echo "Running nosetests with arguments: $(params.args)"
+        nosetests $(params.args)
