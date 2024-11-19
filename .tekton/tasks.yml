@@ -36,10 +36,9 @@ metadata:
 spec:
   workspaces:
     - name: source
-      description: The workspace containing the source code
   params:
     - name: args
-      description: Arguments to pass to `nose`
+      description: Arguments to pass to nose
       type: string
       default: "-v"
   steps:
@@ -49,8 +48,6 @@ spec:
       script: |
         #!/bin/bash
         set -e
-        echo "Upgrading pip and installing dependencies..."
         python -m pip install --upgrade pip wheel
         pip install -r requirements.txt
-        echo "Running nosetests with arguments: $(params.args)"
         nosetests $(params.args)
